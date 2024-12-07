@@ -14,7 +14,7 @@ export default function Login() {
         setLoading(true); // Activar el spinner
 
         try {
-            const response = await fetch('http://192.168.100.16:3000/auth/login', {
+            const response = await fetch('https://test-app-railway-production.up.railway.app/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password }), // Enviar los datos como JSON

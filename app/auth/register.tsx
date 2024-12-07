@@ -16,7 +16,7 @@ export default function Register() {
         setLoading(true); // Activar el spinner de carga
 
         try {
-            const response = await fetch('http://192.168.100.16:3000/auth/register', {
+            const response = await fetch('https://test-app-railway-production.up.railway.app/auth/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, email, password, age, gender }), // Enviar los datos como JSON
