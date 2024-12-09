@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';  // Importa el hook useRouter
-import { apiRequest } from '../api/api';  // Función para las solicitudes HTTP
-import { Picker } from '@react-native-picker/picker';  // Actualizar la importación
-import { Ionicons } from '@expo/vector-icons';  // Importa el ícono de la librería
+import { SafeAreaView, View, Text, FlatList, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { apiRequest } from '../api/api';
+import { Picker } from '@react-native-picker/picker';
+import { Ionicons } from '@expo/vector-icons';
 
-// Definir el tipo para las rutinas
 interface Routine {
     id: number;
     age_group: string;
@@ -13,22 +12,22 @@ interface Routine {
 }
 
 const Routines = () => {
-    const router = useRouter();  // Hook para acceder a la navegación
-    const [routines, setRoutines] = useState<Routine[]>([]);  // Tipar el estado como un array de `Routine`
+    const router = useRouter();
+    const [routines, setRoutines] = useState<Routine[]>([]);
     const [loading, setLoading] = useState(true);
-    const [ageGroup, setAgeGroup] = useState<string>('Adulto');  // Estado para almacenar la selección del grupo de edad
-    const [age, setAge] = useState<number>(30);  // Edad por defecto para el grupo "Adulto" (18-50)
+    const [ageGroup, setAgeGroup] = useState<string>('Niño');
+    const [age, setAge] = useState<number>(30);
 
     useEffect(() => {
         const fetchRoutines = async () => {
-            setLoading(true);  // Activar el spinner al hacer la solicitud
+            setLoading(true);
             try {
-                const data = await apiRequest(`/routines/${age}`, 'GET');  // Llamada a la API
+                const data = await apiRequest(`/routines/${age}`, 'GET');
                 setRoutines(data);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false);  // Desactivar el spinner una vez cargado
+                setLoading(false);
             }
         };
 
@@ -37,49 +36,81 @@ const Routines = () => {
 
     const handleAgeChange = (value: string) => {
         setAgeGroup(value);
-        // Establecer la edad según la opción seleccionada
-        if (value === 'Niño') {
-            setAge(10);  // Edad para el grupo "Niño"
-        } else if (value === 'Adulto') {
-            setAge(30);  // Edad para el grupo "Adulto" (18-50)
-        } else {
-            setAge(70);  // Edad para el grupo "Adulto Mayor"
-        }
+        if (value === 'Niño') setAge(50);
+        else if (value === 'Adulto') setAge(60);
+        else setAge(70);
     };
 
-    if (loading) return <ActivityIndicator size="large" color="blue" />;  // Spinner mientras se cargan las rutinas
+    if (loading) return <ActivityIndicator size="large" color="blue" style={styles.loader} />;
 
     return (
-        <View style={{ padding: 16 }}>
-            {/* Botón de retroceso con una flecha */}
-            <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 20 }}>
+        <SafeAreaView style={styles.container}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={30} color="black" />
             </TouchableOpacity>
 
-            <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>Rutinas Personalizadas</Text>
+            <Text style={styles.title}>Rutinas Personalizadas</Text>
             
-            <Text style={{ fontSize: 14, fontWeight: 'bold', marginBottom: 10 }}>Seleccione su edad</Text>
+            <Text style={styles.label}>Seleccione su edad</Text>
             <Picker
                 selectedValue={ageGroup}
                 onValueChange={handleAgeChange}
-                style={{ height: 50, width: 200, marginBottom: 20 }}
+                style={styles.picker}
             >
-                <Picker.Item label="< 18 años" value="Niño" />
-                <Picker.Item label="18 - 50 años" value="Adulto" />
-                <Picker.Item label="50+ años" value="Adulto Mayor" />
+                <Picker.Item label="50 - 59 años" value="Niño" />
+                <Picker.Item label="60 - 69 años" value="Adulto" />
+                <Picker.Item label="70 - 80 años" value="Adulto Mayor" />
             </Picker>
             
             <FlatList
-                data={routines}  // Datos de las rutinas obtenidas de la API
-                keyExtractor={(item) => item.id.toString()}  // Usar el ID como clave única
+                data={routines}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
-                    <View style={{ marginBottom: 15 }}>
-                        <Text>- {item.description}</Text>  {/* Descripción de cada rutina */}
+                    <View style={styles.routineItem}>
+                        <Text>- {item.description}</Text>
                     </View>
                 )}
+                contentContainerStyle={styles.listContent}
             />
-        </View>
+        </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: '#fff',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backButton: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    label: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    picker: {
+        height: 50,
+        width: 200,
+        marginBottom: 20,
+    },
+    routineItem: {
+        marginBottom: 15,
+    },
+    listContent: {
+        paddingBottom: 20, // Asegura que haya espacio suficiente al final
+    },
+});
 
 export default Routines;

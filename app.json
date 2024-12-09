@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "fitness-app-mobile",
-    "slug": "fitness-app-mobile",
+    "name": "AgeFit",
+    "slug": "ageFit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -13,9 +13,10 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.elias_tg.ageFit"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +37,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f380c018-0d6b-4725-be0e-714b003e32a4"
+      }
     }
   }
 }

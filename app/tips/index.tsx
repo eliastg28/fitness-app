@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { apiRequest } from '../api/api';  // Función para las solicitudes HTTP
+import { SafeAreaView, View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { apiRequest } from '../api/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-// Definir el tipo para los consejos
 interface Tip {
     id: number;
     title: string;
@@ -12,51 +11,77 @@ interface Tip {
 }
 
 const Tips = () => {
-    const [tips, setTips] = useState<Tip[]>([]);  // Tipar el estado como un array de `Tip`
+    const [tips, setTips] = useState<Tip[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTips = async () => {
             try {
-                const data = await apiRequest('/tips', 'GET');  // Llamada a la API
+                const data = await apiRequest('/tips', 'GET');
                 setTips(data);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false);  // Desactivar el spinner una vez cargado
+                setLoading(false);
             }
         };
         fetchTips();
     }, []);
 
-    if (loading) return <ActivityIndicator size="large" color="blue" />;  // Spinner mientras se cargan los consejos
+    if (loading) return <ActivityIndicator size="large" color="blue" style={styles.loader} />;
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 20 }}>
+        <SafeAreaView style={styles.container}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={30} color="black" />
             </TouchableOpacity>
 
             <Text style={styles.title}>Consejos para la salud</Text>
+
             <FlatList
-                data={tips}  // Datos de los consejos obtenidos de la API
-                keyExtractor={(item) => item.id.toString()}  // Usar el ID como clave única
+                data={tips}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.tipContainer}>
                         <Text style={styles.tipTitle}>{item.title}</Text>
-                        <Text>{item.content}</Text>  {/* Contenido de cada consejo */}
+                        <Text>{item.content}</Text>
                     </View>
                 )}
+                contentContainerStyle={styles.listContent}
             />
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16 },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    tipContainer: { marginBottom: 20 },
-    tipTitle: { fontSize: 18, fontWeight: 'bold' },
+    container: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: '#fff',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backButton: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    tipContainer: {
+        marginBottom: 20,
+    },
+    tipTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    listContent: {
+        paddingBottom: 20, // Espacio adicional al final del scroll
+    },
 });
 
 export default Tips;

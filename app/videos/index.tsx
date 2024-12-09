@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Linking, View, Text, FlatList, Button, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
-import { apiRequest } from '../api/api';  // Función para las solicitudes HTTP
+import { Linking, SafeAreaView, View, Text, FlatList, Button, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
+import { apiRequest } from '../api/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 
-// Definir el tipo para los videos
 interface Video {
     id: number;
     title: string;
@@ -13,34 +12,36 @@ interface Video {
 }
 
 const Videos = () => {
-    const [videos, setVideos] = useState<Video[]>([]);  // Tipar el estado como un array de `Video`
+    const [videos, setVideos] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchVideos = async () => {
             try {
-                const data = await apiRequest('/videos', 'GET');  // Llamada a la API
+                const data = await apiRequest('/videos', 'GET');
                 setVideos(data);
             } catch (error) {
                 console.error(error);
             } finally {
-                setLoading(false);  // Desactivar el spinner una vez cargados los videos
+                setLoading(false);
             }
         };
         fetchVideos();
     }, []);
 
-    if (loading) return <ActivityIndicator size="large" color="blue" />;  // Spinner mientras se cargan los videos
+    if (loading) return <ActivityIndicator size="large" color="blue" style={styles.loader} />;
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={() => router.back()} style={{ marginBottom: 20 }}>
+        <SafeAreaView style={styles.container}>
+            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                 <Ionicons name="arrow-back" size={30} color="black" />
             </TouchableOpacity>
+
             <Text style={styles.title}>Videos de Ejercicios</Text>
+
             <FlatList
-                data={videos}  // Datos de los videos obtenidos de la API
-                keyExtractor={(item) => item.id.toString()}  // Usar el ID como clave única
+                data={videos}
+                keyExtractor={(item) => item.id.toString()}
                 renderItem={({ item }) => (
                     <View style={styles.videoContainer}>
                         <Text style={styles.videoTitle}>{item.title}</Text>
@@ -48,8 +49,9 @@ const Videos = () => {
                         <Button title="Ver en YouTube" onPress={() => handleOpenVideo(item.url)} />
                     </View>
                 )}
+                contentContainerStyle={styles.listContent}
             />
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -58,10 +60,34 @@ const handleOpenVideo = (url: string) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16 },
-    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-    videoContainer: { marginBottom: 20 },
-    videoTitle: { fontSize: 18, fontWeight: 'bold' },
+    container: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: '#fff',
+    },
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    backButton: {
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    videoContainer: {
+        marginBottom: 20,
+    },
+    videoTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    listContent: {
+        paddingBottom: 20, // Asegura espacio al final del scroll
+    },
 });
 
 export default Videos;
